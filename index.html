@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matemáticas.</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e28;
+    --border: rgba(255,255,255,0.07);
+    --sin: #ff6b6b;
+    --cos: #4ecdc4;
+    --radius: #a78bfa;
+    --gold: #ffd166;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --accent: #818cf8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === HERO === */
+  .hero {
+    text-align: center;
+    padding: 4rem 2rem 2rem;
+    position: relative;
+    margin-left: 280px;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, rgba(129,140,248,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+font-size: clamp(2.8rem, 7vw, 5.5rem);
+    line-height: 1.08;
+    font-weight: 400;
+    background: linear-gradient(135deg, #e8eaf0 0%, #a78bfa 50%, #4ecdc4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #e8eaf0;
+    margin-bottom: 1.25rem;
+  }
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 500; }
+
+  /* === LAYOUT === */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+  .section { padding: 3rem 0; margin-left: 280px; }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    margin-bottom: 0.4rem;
+  }
+  .section-desc {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  /* === MAIN INTERACTIVE === */
+  .main-interactive {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media(max-width:900px){ .main-interactive{ grid-template-columns:1fr; } }
+
+  /* === CIRCLE PANEL === */
+  .circle-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    position: sticky;
+    top: 1rem;
+  }
+  .circle-panel canvas { display: block; margin: 0 auto; }
+  .angle-ctrl {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .angle-ctrl label {
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .angle-ctrl label span {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--surface2);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--accent);
+    transition: transform .15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  .values-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 1rem;
+  }
+  .val-card {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .val-card .vl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
+  .val-card .vv { font-family: 'DM Mono', monospace; font-size: 1.1rem; font-weight: 500; }
+  .v-sin .vv { color: var(--sin); }
+  .v-cos .vv { color: var(--cos); }
+  .v-tan .vv { color: var(--gold); }
+
+  /* === RIGHT PANEL === */
+  .right-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  /* wave chart */
+  .wave-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.5rem;
+  }
+  .wave-box canvas { display: block; width: 100%; border-radius: 8px; }
+  .wave-legend {
+    display: flex; gap: 1.5rem; margin-bottom: 0.75rem;
+    font-size: 13px; color: var(--muted);
+  }
+  .wave-legend span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* === PROPERTIES === */
+  .props-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+  .prop-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s, transform .2s;
+  }
+  .prop-card:hover { border-color: rgba(129,140,248,0.3); transform: translateY(-2px); }
+  .prop-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    border-radius: 16px 16px 0 0;
+  }
+  .prop-card.sin::before { background: var(--sin); }
+  .prop-card.cos::before { background: var(--cos); }
+  .prop-card.both::before { background: linear-gradient(90deg,var(--sin),var(--cos)); }
+  .prop-card.special::before { background: var(--gold); }
+  .prop-card .prop-icon { font-size: 1.5rem; margin-bottom: 0.6rem; }
+  .prop-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 0.3rem; }
+  .prop-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .prop-card .formula {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 5px 10px;
+    margin-top: 8px;
+    display: inline-block;
+    color: var(--text);
+  }
+
+  /* === LOGS SECTION === */
+  .logs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  .log-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    transition: border-color .2s, transform .2s;
+  }
+  .log-card:hover { border-color: rgba(167,139,250,0.4); transform: translateY(-2px); }
+  .log-num { font-family: 'DM Mono', monospace; font-size: 0.9rem; color: var(--accent); margin-bottom: 6px; }
+  .log-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .log-card .log-formula {
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem;
+    color: var(--radius);
+    background: rgba(167,139,250,0.1);
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin: 8px 0;
+    display: block;
+  }
+  .log-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .log-card .example { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.prop-card .example { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  /* === TABLE === */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .table-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .table-header h3 { font-size: 1rem; font-weight: 500; }
+  .table-filter {
+    display: flex; gap: 6px;
+  }
+  .filter-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    padding: 4px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .filter-btn.active, .filter-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .angles-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .angles-table th {
+    padding: 10px 16px;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    background: var(--surface2);
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+  .angles-table td {
+    padding: 11px 16px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    transition: background .15s;
+    cursor: pointer;
+  }
+  .angles-table tr:hover td { background: rgba(255,255,255,0.03); }
+  .angles-table tr.highlighted td { background: rgba(129,140,248,0.1); }
+  .angles-table tr.highlighted td:first-child { border-left: 2px solid var(--accent); }
+  .td-deg { color: var(--text); font-weight: 500; }
+  .td-rad { color: var(--muted); font-size: 12px; }
+  .td-sin { color: var(--sin); }
+  .td-cos { color: var(--cos); }
+  .td-tan { color: var(--gold); }
+  .td-bar { width: 80px; }
+  .bar-wrap { display: flex; align-items: center; gap: 5px; }
+  .bar-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 2px; transition: width .3s; }
+
+  /* === FOOTER === */
+  footer {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+  footer span { color: var(--accent); }
+
+  /* Tree nav */
+  .tree-nav {
+    position: fixed;
+    top: 1rem; left: 1rem;
+    width: 260px;
+    max-height: calc(100vh - 2rem);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem;
+    z-index: 100;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .tree-nav-search {
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+  .tree-nav-search input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .tree-nav-search input:focus {
+    border-color: var(--accent);
+  }
+  .tree-nav-search input::placeholder {
+    color: var(--muted);
+  }
+  .tree-nav-search .search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 14px;
+    pointer-events: none;
+  }
+  .tree-nav-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    z-index: 101;
+  }
+  .tree-nav-results.show {
+    display: block;
+  }
+  .tree-nav-results a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: var(--text);
+    font-size: 12px;
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+  }
+  .tree-nav-results a:last-child {
+    border-bottom: none;
+  }
+  .tree-nav-results a:hover {
+    background: var(--surface2);
+  }
+  .tree-nav-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .tree-nav-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .2s;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .tree-nav-header:hover {
+    background: rgba(255,255,255,0.05);
+  }
+  .tree-nav-header .icon {
+    font-size: 16px;
+  }
+  .tree-nav-header .title {
+    flex: 1;
+  }
+  .tree-nav-header .arrow {
+    color: var(--muted);
+    transition: transform .2s;
+    font-size: 10px;
+  }
+  .tree-nav-section.expanded .tree-nav-header .arrow {
+    transform: rotate(180deg);
+  }
+  .tree-nav-items {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 0.5rem;
+  }
+  .tree-nav-section.expanded .tree-nav-items {
+    display: flex;
+  }
+  .tree-nav-items a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    padding-left: 0.75rem;
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: all .15s;
+  }
+  .tree-nav-items a:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+  }
+  .tree-nav-items a.active {
+    color: var(--text);
+    background: rgba(255,255,255,0.05);
+  }
+  .tree-nav-items .num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    opacity: 0.7;
+  }
+  /* Ramas colors */
+  .rama-tri .tree-nav-header { background: linear-gradient(135deg, #ffd166, #a78bfa); }
+  .rama-sen .tree-nav-header { background: linear-gradient(135deg, #818cf8, #4ecdc4); }
+  .rama-pot .tree-nav-header { background: linear-gradient(135deg, #ffd166, #ff6b6b); }
+  .rama-rai .tree-nav-header { background: linear-gradient(135deg, #a78bfa, #818cf8); }
+  .rama-log .tree-nav-header { background: linear-gradient(135deg, #4ecdc4, #ffd166); }
+  .rama-tri.active .tree-nav-header { background: #ffd166; color: #000; }
+  .rama-sen.active .tree-nav-header { background: #818cf8; color: #fff; }
+  .rama-pot.active .tree-nav-header { background: #ffd166; color: #000; }
+  .rama-rai.active .tree-nav-header { background: #a78bfa; color: #fff; }
+  .rama-log.active .tree-nav-header { background: #4ecdc4; color: #000; }
+  .rama-tri .tree-nav-items a.active { border-left: 2px solid #ffd166; }
+  .rama-tri .tree-nav-items a.active { border-left: 2px solid #ffd166; }
+  .rama-sen .tree-nav-items a.active { border-left: 2px solid #818cf8; }
+  .rama-pot .tree-nav-items a.active { border-left: 2px solid #ffd166; }
+  .rama-rai .tree-nav-items a.active { border-left: 2px solid #a78bfa; }
+  .rama-log .tree-nav-items a.active { border-left: 2px solid #4ecdc4; }
+  @media(max-width:600px){ .tree-nav{ display:none; } }
+</style>
+</head>
+<body>
+
+<!-- Tree Nav -->
+<nav class="tree-nav" id="treeNav">
+  <div class="tree-nav-search">
+    <input type="text" id="navSearch" placeholder="Buscar...">
+    <span class="search-icon">🔍</span>
+    <div class="tree-nav-results" id="navResults"></div>
+  </div>
+  
+  <!-- Seno y Coseno -->
+  <div class="tree-nav-section rama-sen expanded" data-rama="sen">
+    <div class="tree-nav-header" onclick="toggleRama(this)">
+      <span class="icon">📐</span>
+      <span class="title">Seno y Coseno</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="tree-nav-items">
+      <a href="#definiciones"><span class="num">1.1</span> Fundamentos</a>
+      <a href="#circulo"><span class="num">1.2</span> Círculo</a>
+      <a href="#propiedades"><span class="num">1.3</span> Propiedades</a>
+      <a href="#tabla"><span class="num">1.4</span> Referencia</a>
+    </div>
+  </div>
+  
+  <!-- Potencias -->
+  <div class="tree-nav-section rama-pot" data-rama="pot">
+    <div class="tree-nav-header" onclick="toggleRama(this)">
+      <span class="icon">⚡</span>
+      <span class="title">Potencias</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="tree-nav-items">
+      <a href="#potencias"><span class="num">2.1</span> ¿Qué es?</a>
+      <a href="#prop-potencias"><span class="num">2.2</span> Propiedades</a>
+    </div>
+  </div>
+  
+  <!-- Raíces -->
+  <div class="tree-nav-section rama-rai" data-rama="rai">
+    <div class="tree-nav-header" onclick="toggleRama(this)">
+      <span class="icon">🌱</span>
+      <span class="title">Raíces</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="tree-nav-items">
+      <a href="#raices"><span class="num">3.1</span> ¿Qué es?</a>
+      <a href="#prop-raices"><span class="num">3.2</span> Propiedades</a>
+    </div>
+  </div>
+  
+  <!-- Triángulos -->
+  <div class="tree-nav-section rama-tri" data-rama="tri">
+    <div class="tree-nav-header" onclick="toggleRama(this)">
+      <span class="icon">📐</span>
+      <span class="title">Triángulos</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="tree-nav-items">
+      <a href="#triangulo"><span class="num">4.1</span> Definición</a>
+      <a href="#clasificacion"><span class="num">4.2</span> Clasificación</a>
+      <a href="#teoremas"><span class="num">4.3</span> Teoremas</a>
+      <a href="#isoceles"><span class="num">4.3b</span> Isósceles</a>
+      <a href="#teoremas-cualesquiera"><span class="num">4.4</span> Cualesquiera</a>
+    </div>
+  </div>
+  
+  <!-- Logaritmos -->
+  <div class="tree-nav-section rama-log" data-rama="log">
+    <div class="tree-nav-header" onclick="toggleRama(this)">
+      <span class="icon">📓</span>
+      <span class="title">Logaritmos</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="tree-nav-items">
+      <a href="#definicion-log"><span class="num">5.1</span> ¿Qué es?</a>
+      <a href="#logaritmos"><span class="num">5.2</span> Propiedades</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <p class="hero-eyebrow">Matemáticas Interactivas</p>
+  <h1 id="mainTitle">Matemáticas</h1>
+  <p class="hero-sub"><strong>Matemáticas</strong> bien explicada con <strong>animaciones en tiempo real</strong></p>
+</section>
+
+<!-- SENO COSENO DEFINITION -->
+<section class="section" id="definiciones">
+  <div class="container">
+    <p class="section-label">1.1 — Fundamentos</p>
+    <h2 class="section-title">¿Qué son el Seno y el Coseno?</h2>
+    <p class="section-desc">Las funciones trigonométricas más fundamentales explicadas desde cero.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem;margin-top:2rem">
+      <!-- SENO -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem">
+        <div style="font-size:2.5rem;margin-bottom:1rem">📐</div>
+        <h3 style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:1rem;color:var(--sin)">El Seno (sen)</h3>
+        <p style="color:var(--muted);line-height:1.7;margin-bottom:1.25rem">
+          El <strong>seno</strong> de un ángulo mide la posición vertical (altura) de un punto en el círculo unitario. En un triángulo rectángulo, es la razón entre el <em>cateto opuesto</em> y la <em>hipotenusa</em>.
+        </p>
+        <div style="background:var(--surface2);border-radius:12px;padding:1rem;margin-bottom:1rem">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:0.5rem">Fórmula en triángulo rectángulo</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--text)">sen(θ) = cateto opuesto / hipotenusa</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1rem;margin-bottom:1rem">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:0.5rem">En el círculo unitario</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--text)">sen(θ) = coordenada Y del punto</p>
+        </div>
+        <div style="border-left:3px solid var(--sin);padding-left:1rem">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:0.5rem">📌 Características clave</p>
+          <ul style="color:var(--muted);font-size:13px;line-height:1.8;padding-left:1rem">
+            <li><strong>Rango:</strong> siempre entre −1 y 1</li>
+            <li><strong>Período:</strong> se repite cada 360°</li>
+            <li><strong>Cero en:</strong> 0°, 180°, 360°</li>
+            <li><strong>Máximo:</strong> 1 en 90°</li>
+            <li><strong>Mínimo:</strong> −1 en 270°</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- COSENO -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem">
+        <div style="font-size:2.5rem;margin-bottom:1rem">📏</div>
+        <h3 style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:1rem;color:var(--cos)">El Coseno (cos)</h3>
+        <p style="color:var(--muted);line-height:1.7;margin-bottom:1.25rem">
+          El <strong>coseno</strong> de un ángulo mide la posición horizontal (base) de un punto en el círculo unitario. En un triángulo rectángulo, es la razón entre el <em>cateto adyacente</em> y la <em>hipotenusa</em>.
+        </p>
+        <div style="background:var(--surface2);border-radius:12px;padding:1rem;margin-bottom:1rem">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:0.5rem">Fórmula en triángulo rectángulo</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--text)">cos(θ) = cateto adyacente / hipotenusa</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1rem;margin-bottom:1rem">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:0.5rem">En el círculo unitario</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--text)">cos(θ) = coordenada X del punto</p>
+        </div>
+        <div style="border-left:3px solid var(--cos);padding-left:1rem">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:0.5rem">📌 Características clave</p>
+          <ul style="color:var(--muted);font-size:13px;line-height:1.8;padding-left:1rem">
+            <li><strong>Rango:</strong> siempre entre −1 y 1</li>
+            <li><strong>Período:</strong> se repite cada 360°</li>
+            <li><strong>Cero en:</strong> 90°, 270°</li>
+            <li><strong>Máximo:</strong> 1 en 0° y 360°</li>
+            <li><strong>Mínimo:</strong> −1 en 180°</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual explanation -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">🎓 La intuition gráfica</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem">
+        <div>
+          <p style="color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:1rem">
+            <strong>En el círculo unitario:</strong> para cualquier ángulo θ, trazás un radio desde el centro. El punto donde toca la circunferencia tiene coordenadas:
+          </p>
+          <ul style="color:var(--text);font-size:14px;line-height:2;padding-left:1.5rem">
+            <li style="color:var(--cos)">x = cos(θ)</li>
+            <li style="color:var(--sin)">y = sen(θ)</li>
+          </ul>
+        </div>
+        <div>
+          <p style="color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:1rem">
+            <strong>En un triángulo rectángulo:</strong> con ángulo θ en un vértice:
+          </p>
+          <ul style="color:var(--text);font-size:14px;line-height:2;padding-left:1.5rem">
+            <li style="color:var(--sin)">sen(θ) = alto / incline</li>
+            <li style="color:var(--cos)">cos(θ) = ancho / incline</li>
+          </ul>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-top:1.25rem">
+        <p style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--accent)">📐 sen²(θ) + cos²(θ) = 1</p>
+        <p style="color:var(--muted);font-size:13px;margin-top:0.5rem">Esta es la identidad pitagórica — siempre se cumple, para cualquier ángulo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN INTERACTIVE -->
+<section class="section" id="circulo">
+  <div class="container">
+    <p class="section-label">1.2 — Círculo trigonométrico</p>
+    <h2 class="section-title">Mueve el ángulo</h2>
+    <p class="section-desc">Arrastra el slider o haz clic en la tabla para cambiar el ángulo. El círculo y la onda se actualizan en tiempo real.</p>
+
+    <div class="main-interactive">
+      <!-- Circle -->
+      <div class="circle-panel">
+        <canvas id="circleCanvas" width="296" height="296"></canvas>
+        <div class="angle-ctrl">
+          <label>Ángulo <span id="degShow">45°</span></label>
+          <input type="range" id="angleSlider" min="0" max="360" value="45" step="1">
+          <label>Radianes <span id="radShow">π/4</span></label>
+        </div>
+        <div class="values-row">
+          <div class="val-card v-sin">
+            <div class="vl">Sen</div>
+            <div class="vv" id="sinShow">0.71</div>
+          </div>
+          <div class="val-card v-cos">
+            <div class="vl">Cos</div>
+            <div class="vv" id="cosShow">0.71</div>
+          </div>
+          <div class="val-card v-tan">
+            <div class="vl">Tan</div>
+            <div class="vv" id="tanShow">1.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="right-panel">
+        <div class="wave-box">
+          <div class="wave-legend">
+            <span><span class="dot" style="background:var(--sin)"></span> Seno</span>
+            <span><span class="dot" style="background:var(--cos)"></span> Coseno</span>
+          </div>
+          <canvas id="waveCanvas" height="180"></canvas>
+        </div>
+
+        <!-- Identity visual -->
+        <div class="wave-box" style="padding:1.5rem">
+          <p class="section-label" style="margin-bottom:0.3rem">Identidad pitagórica</p>
+          <p style="font-size:0.9rem;color:var(--muted);margin-bottom:1rem">sen²(θ) + cos²(θ) = 1 — siempre, para cualquier ángulo</p>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <div style="flex:1;min-width:160px">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:4px">sen²(θ)</div>
+              <div style="height:20px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden">
+                <div id="sin2bar" style="height:100%;background:var(--sin);border-radius:4px;transition:width .3s"></div>
+              </div>
+              <div id="sin2val" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--sin);margin-top:3px">0.50</div>
+            </div>
+            <div style="font-size:1.2rem;color:var(--muted)">+</div>
+            <div style="flex:1;min-width:160px">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:4px">cos²(θ)</div>
+              <div style="height:20px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden">
+                <div id="cos2bar" style="height:100%;background:var(--cos);border-radius:4px;transition:width .3s"></div>
+              </div>
+              <div id="cos2val" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--cos);margin-top:3px">0.50</div>
+            </div>
+            <div style="font-size:1.2rem;color:var(--muted)">=</div>
+            <div style="background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);border-radius:10px;padding:8px 18px;text-align:center">
+              <div style="font-size:11px;color:var(--muted)">Total</div>
+              <div id="sumVal" style="font-family:'DM Mono',monospace;font-size:1.4rem;color:var(--accent);font-weight:500">1.00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIG PROPERTIES -->
+<section class="section" id="propiedades">
+  <div class="container">
+    <p class="section-label">1.3 — Trigonometría</p>
+    <h2 class="section-title">Propiedades del seno y coseno</h2>
+    <p class="section-desc">Las reglas fundamentales que se cumplen para <em>todos</em> los ángulos.</p>
+
+    <div class="props-grid">
+      <div class="prop-card both">
+        <div class="prop-icon">🔄</div>
+        <h4>Período de 360°</h4>
+        <p>Los valores se repiten exactamente cada vuelta completa.</p>
+        <span class="formula">sen(θ + 360°) = sen(θ)</span>
+      </div>
+      <div class="prop-card both">
+        <div class="prop-icon">📐</div>
+        <h4>Identidad pitagórica</h4>
+        <p>La suma de sus cuadrados siempre da 1. Viene de Pitágoras.</p>
+        <span class="formula">sen²θ + cos²θ = 1</span>
+      </div>
+      <div class="prop-card sin">
+        <div class="prop-icon">🔢</div>
+        <h4>Rango del seno</h4>
+        <p>El seno nunca puede ser mayor que 1 ni menor que −1.</p>
+        <span class="formula">−1 ≤ sen(θ) ≤ 1</span>
+      </div>
+      <div class="prop-card cos">
+        <div class="prop-icon">🔢</div>
+        <h4>Rango del coseno</h4>
+        <p>El coseno tampoco puede salir de ese rango.</p>
+        <span class="formula">−1 ≤ cos(θ) ≤ 1</span>
+      </div>
+      <div class="prop-card sin">
+        <div class="prop-icon">🪞</div>
+        <h4>Seno es función impar</h4>
+        <p>Si cambias el signo del ángulo, el seno cambia de signo.</p>
+        <span class="formula">sen(−θ) = −sen(θ)</span>
+      </div>
+      <div class="prop-card cos">
+        <div class="prop-icon">🪞</div>
+        <h4>Coseno es función par</h4>
+        <p>Cambiar el signo del ángulo no cambia el coseno.</p>
+        <span class="formula">cos(−θ) = cos(θ)</span>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">🤝</div>
+        <h4>Relación entre sen y cos</h4>
+        <p>Son la misma función, pero desplazadas 90° entre sí.</p>
+        <span class="formula">sen(θ) = cos(90° − θ)</span>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">➗</div>
+        <h4>La tangente</h4>
+        <p>La tangente es simplemente el cociente entre sen y cos.</p>
+        <span class="formula">tan(θ) = sen(θ) / cos(θ)</span>
+      </div>
+      <div class="prop-card sin">
+        <div class="prop-icon">📍</div>
+        <h4>Valores especiales (sen)</h4>
+        <p>Valores clave a memorizar.</p>
+        <span class="formula">sen(0°)=0, sen(90°)=1, sen(180°)=0</span>
+      </div>
+      <div class="prop-card cos">
+        <div class="prop-icon">📍</div>
+        <h4>Valores especiales (cos)</h4>
+        <p>El coseno empieza en 1 y baja.</p>
+        <span class="formula">cos(0°)=1, cos(90°)=0, cos(180°)=−1</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TABLE 1.4 -->
+<section class="section" id="tabla">
+  <div class="container">
+    <p class="section-label">1.4 — Referencia</p>
+    <h2 class="section-title">Tabla de ángulos y valores</h2>
+    <p class="section-desc">Haz clic en cualquier fila para ver el ángulo en el círculo. Filtra por cuadrante.</p>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>Ángulos del 0° al 360°</h3>
+        <div class="table-filter">
+          <button class="filter-btn active" onclick="filterTable('all', this)">Todos</button>
+          <button class="filter-btn" onclick="filterTable('Q1', this)">Q1</button>
+          <button class="filter-btn" onclick="filterTable('Q2', this)">Q2</button>
+          <button class="filter-btn" onclick="filterTable('Q3', this)">Q3</button>
+          <button class="filter-btn" onclick="filterTable('Q4', this)">Q4</button>
+          <button class="filter-btn" onclick="filterTable('special', this)">Especiales</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="angles-table" id="angleTable">
+          <thead>
+            <tr>
+              <th>Grados</th>
+              <th>Radianes</th>
+              <th>Seno</th>
+              <th>Coseno</th>
+              <th>Tangente</th>
+              <th>Seno (barra)</th>
+              <th>Cos (barra)</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POTENCIAS DEFINITION -->
+<section class="section" id="potencias">
+  <div class="container">
+    <p class="section-label">2.1 — ¿Qué es una Potencia?</p>
+    <h2 class="section-title">¿Qué es una Potencia?</h2>
+    <p class="section-desc">La forma compacta de expresar multiplicaciones repetidas.</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem">
+        <div>
+          <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">📓 La definición</h3>
+          <p style="color:var(--muted);line-height:1.8;margin-bottom:1.25rem">
+            Una <strong>potencia</strong> es una forma abreviada de escribir una multiplicación repetida del mismo número.
+          </p>
+          <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:0.5rem">Definición formal</p>
+            <p style="font-family:'DM Mono',monospace;font-size:1.3rem;color:var(--text)">a<sup>n</sup> = a × a × ... × a</p>
+            <p style="color:var(--muted);font-size:13px;margin-top:0.5rem">(n veces)</p>
+          </div>
+          <ul style="color:var(--text);font-size:14px;line-height:2;padding-left:1.5rem">
+            <li><strong>a</strong> = base (el número que se multiplica)</li>
+            <li><strong>n</strong> = exponente (cuántas veces)</li>
+            <li><strong>a<sup>n</sup></strong> = potencia</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">📝 Ejemplo visual</h3>
+          <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+            <p style="color:var(--muted);font-size:13px;margin-bottom:0.5rem">2⁴ significa:</p>
+            <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text)">2 × 2 × 2 × 2 = 16</p>
+            <p style="color:var(--accent);font-size:14px;margin-top:0.5rem">→ 2⁴ = 16</p>
+          </div>
+          <div style="background:var(--surface2);border-radius:12px;padding:1.25rem">
+            <p style="color:var(--muted);font-size:13px;margin-bottom:0.5rem">3³ significa:</p>
+            <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text)">3 × 3 × 3 = 27</p>
+            <p style="color:var(--accent);font-size:14px;margin-top:0.5rem">→ 3³ = 27</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Casos especiales -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--gold)">🌟 Casos especiales importantes</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--gold);margin-bottom:0.5rem">a⁰ = 1</p>
+          <p style="color:var(--muted);font-size:13px">Cualquier base elevada a 0 da 1</p>
+          <p style="color:var(--text);font-size:12px;margin-top:0.5rem">5⁰ = 1, 100⁰ = 1</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--gold);margin-bottom:0.5rem">a¹ = a</p>
+          <p style="color:var(--muted);font-size:13px">Exponente 1 = la misma base</p>
+          <p style="color:var(--text);font-size:12px;margin-top:0.5rem">7¹ = 7, (−3)¹ = −3</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--gold);margin-bottom:0.5rem">a<sup>−n</sup> = 1/a<sup>n</sup></p>
+          <p style="color:var(--muted);font-size:13px">Exponente negativo = inverso</p>
+          <p style="color:var(--text);font-size:12px;margin-top:0.5rem">2<sup>−3</sup> = 1/8</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual interactivo de potencias -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">🎓 Crecimiento exponencial</h3>
+      <p style="color:var(--muted);line-height:1.7;margin-bottom:1rem">
+        Las potencias crecen<strong> increíblemente rápido</strong>. Mirá cómo crecen:
+      </p>
+      <canvas id="potenciaCanvas" style="display:block;width:100%;height:200px;background:var(--surface2);border-radius:12px;margin-bottom:1rem"></canvas>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+        <button class="filter-btn active" onclick="updatePotenciaGrafico(2, this)">2ⁿ</button>
+        <button class="filter-btn" onclick="updatePotenciaGrafico(3, this)">3ⁿ</button>
+        <button class="filter-btn" onclick="updatePotenciaGrafico(5, this)">5ⁿ</button>
+        <button class="filter-btn" onclick="updatePotenciaGrafico(10, this)">10ⁿ</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROPIEDADES POTENCIAS -->
+<section class="section" id="prop-potencias">
+  <div class="container">
+    <p class="section-label">2.2 — Propiedades</p>
+    <h2 class="section-title">Propiedades de las Potencias</h2>
+    <p class="section-desc">Las reglas que siempre se cumplen al trabajar con potencias.</p>
+
+    <div class="props-grid" style="margin-top:1.5rem">
+      <div class="prop-card special">
+        <div class="prop-icon">✖️</div>
+        <h4>Producto de misma base</h4>
+        <p>Al multiplicar potencias con la misma base, los exponentes se suman.</p>
+        <span class="formula">a<sup>m</sup> · a<sup>n</sup> = a<sup>m+n</sup></span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: 2³ · 2⁴ = 2⁷ = 128</div>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">➗</div>
+        <h4>Cociente de misma base</h4>
+        <p>Al dividir potencias con la misma base, los exponentes se restan.</p>
+        <span class="formula">a<sup>m</sup> / a<sup>n</sup> = a<sup>m−n</sup></span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: 2⁵ / 2² = 2³ = 8</div>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">🎯</div>
+        <h4>Potencia de potencia</h4>
+        <p>Cuando elevás una potencia a otra potencia, multiplicás los exponentes.</p>
+        <span class="formula">(a<sup>m</sup>)<sup>n</sup> = a<sup>m·n</sup></span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: (2³)² = 2⁶ = 64</div>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">📦</div>
+        <h4>Producto de mismo exponente</h4>
+        <p>Podés agrupar las bases primero, el exponente se mantiene.</p>
+        <span class="formula">a<sup>n</sup> · b<sup>n</sup> = (a·b)<sup>n</sup></span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: 2³ · 3³ = (2·3)³ = 6³</div>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">🔄</div>
+        <h4>Cociente de mismo exponente</h4>
+        <p>Podés dividir las bases primero, el exponente se mantiene.</p>
+        <span class="formula">a<sup>n</sup> / b<sup>n</sup> = (a/b)<sup>n</sup></span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: 6³ / 3³ = (6/3)³ = 2³</div>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">♻️</div>
+        <h4>Exponente cero</h4>
+        <p>Cualquier número (excepto 0) elevado a 0 es 1.</p>
+        <span class="formula">a⁰ = 1 (a ≠ 0)</span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: 5⁰ = 1, (−7)⁰ = 1</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RAÍCES DEFINITION -->
+<section class="section" id="raices">
+  <div class="container">
+    <p class="section-label">3.1 — ¿Qué es una Raíz?</p>
+    <h2 class="section-title">¿Qué es una Raíz?</h2>
+    <p class="section-desc">La operación inversa a la potenciación.</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem">
+        <div>
+          <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">📓 La definición</h3>
+          <p style="color:var(--muted);line-height:1.8;margin-bottom:1.25rem">
+            La <strong>raíz</strong> es la operación inversa a la potenciación. Si una potencia eleva un número a una potencia, la raíz encuentra la <em>base</em>.
+          </p>
+          <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:0.5rem">Definición formal</p>
+            <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text)">√<sup>n</sup>√a = b  ⟺  b<sup>n</sup> = a</p>
+          </div>
+          <p style="color:var(--muted);font-size:14px;line-height:1.7">
+            Se lee: "la raíz enésima de <em>a</em> es igual a <em>b</em>".
+          </p>
+        </div>
+        <div>
+          <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">📝 Ejemplo visual</h3>
+          <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+            <p style="color:var(--muted);font-size:13px;margin-bottom:0.5rem">√16 = 4 porque:</p>
+            <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text)">4² = 16</p>
+          </div>
+          <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+            <p style="color:var(--muted);font-size:13px;margin-bottom:0.5rem">³√27 = 3 porque:</p>
+            <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text)">3³ = 27</p>
+          </div>
+          <p style="color:var(--muted);font-size:13px;line-height:1.6">
+            √ sin número = raíz cuadrada (n=2)
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tipos de raíces -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--gold)">🔢 Tipos de raíces</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem">
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="font-family:'DM Mono',monospace;font-size:1.4rem;color:var(--gold);margin-bottom:0.5rem">√a</p>
+          <p style="color:var(--muted);font-size:13px">Raíz cuadrada</p>
+          <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">n = 2</p>
+          <p style="color:var(--text);font-size:12px;margin-top:0.5rem">√16 = 4</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="font-family:'DM Mono',monospace;font-size:1.4rem;color:var(--gold);margin-bottom:0.5rem">³√a</p>
+          <p style="color:var(--muted);font-size:13px">Raíz cúbica</p>
+          <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">n = 3</p>
+          <p style="color:var(--text);font-size:12px;margin-top:0.5rem">³√8 = 2</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="font-family:'DM Mono',monospace;font-size:1.4rem;color:var(--gold);margin-bottom:0.5rem">⁴√a</p>
+          <p style="color:var(--muted);font-size:13px">Raíz cuarta</p>
+          <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">n = 4</p>
+          <p style="color:var(--text);font-size:12px;margin-top:0.5rem">⁴√81 = 3</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="font-family:'DM Mono',monospace;font-size:1.4rem;color:var(--gold);margin-bottom:0.5rem">ⁿ√a</p>
+          <p style="color:var(--muted);font-size:13px">Raíz enésima</p>
+          <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">n = cualquier</p>
+          <p style="color:var(--text);font-size:12px;margin-top:0.5rem">⁵√32 = 2</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Importante: Raíces pares e impares -->
+    <div style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);border-radius:16px;padding:1.5rem;margin-top:1.5rem">
+      <p style="font-size:14px;color:var(--accent);margin-bottom:0.75rem">⚠️ Diferencia crucial: raíces pares vs impares</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem">
+        <div>
+          <p style="color:var(--text);font-size:14px;margin-bottom:0.5rem"><strong>Raíces pares</strong> (√, ⁴√, ...)</p>
+          <ul style="color:var(--muted);font-size:13px;line-height:1.8;padding-left:1.25rem">
+            <li>Solo operan sobre números <strong>≥ 0</strong></li>
+            <li>Tienen <strong>2 soluciones</strong> (±)</li>
+            <li>√4 = ±2</li>
+          </ul>
+        </div>
+        <div>
+          <p style="color:var(--text);font-size:14px;margin-bottom:0.5rem"><strong>Raíces impares</strong> (³√, ⁵√, ...)</p>
+          <ul style="color:var(--muted);font-size:13px;line-height:1.8;padding-left:1.25rem">
+            <li>Operan sobre <strong>cualquier número</strong></li>
+            <li>Tienen <strong>1 solución</strong> única</li>
+            <li>³√−8 = −2</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROPIEDADES RAÍCES -->
+<section class="section" id="prop-raices">
+  <div class="container">
+    <p class="section-label">3.2 — Propiedades</p>
+    <h2 class="section-title">Propiedades de las Raíces</h2>
+    <p class="section-desc">Las reglas que siempre se cumplen al trabajar con raíces.</p>
+
+    <div class="props-grid" style="margin-top:1.5rem">
+      <div class="prop-card special">
+        <div class="prop-icon">✖️</div>
+        <h4>Producto bajo raíz</h4>
+        <p>La raíz de un producto es el producto de las raíces.</p>
+        <span class="formula">√<sup>n</sup>√(a·b) = √<sup>n</sup>√a · √<sup>n</sup>√b</span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: √16 = √(4·4) = √4·√4 = 2·2</div>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">➗</div>
+        <h4>Cociente bajo raíz</h4>
+        <p>La raíz de un cociente es el cociente de las raíces.</p>
+        <span class="formula">√<sup>n</sup>√(a/b) = √<sup>n</sup>√a / √<sup>n</sup>√b</span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: √(16/4) = √16/√4 = 4/2</div>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">🎯</div>
+        <h4>Raíz de raíz</h4>
+        <p>Podés "apilar" las raíces multiplicando los índices.</p>
+        <span class="formula">⁽ᵐ⁾√⁽ⁿ⁾√a = ⁽ᵐ·ⁿ⁾√a</span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: ²√³√8 = ⁶√8 = 2</div>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">📦</div>
+        <h4>Raíz como potencia</h4>
+        <p>Cualquier raíz se puede escribir como potencia.</p>
+        <span class="formula">ⁿ√a = a<sup>1/n</sup></span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: √a = a<sup>1/2</sup>, ³√a = a<sup>1/3</sup></div>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">🔄</div>
+        <h4>Potencia bajo raíz</h4>
+        <p>Elevá la raíz a una potencia para simplificar.</p>
+        <span class="formula">(ⁿ√a)<sup>m</sup> = ⁿ√a<sup>m</sup></span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: (√8)² = ⁵√8² = 8</div>
+      </div>
+      <div class="prop-card special">
+        <div class="prop-icon">♻️</div>
+        <h4>Raíz de exponente</h4>
+        <p>Podés dividir exponente e índice.</p>
+        <span class="formula">ⁿ√a<sup>m</sup> = ⁽ⁿ÷ᵐ⁾√a<sup>m÷n</sup></span>
+        <div class="example" style="margin-top:0.5rem;font-size:12px;color:var(--muted)">Ej: ⁶√8² = ³√8¹ = ³√8 = 2</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIANGULO DEFINICION -->
+<section class="section" id="triangulo">
+  <div class="container">
+    <p class="section-label">4.1 — Definición</p>
+    <h2 class="section-title">¿Qué es un Triángulo?</h2>
+    <p class="section-desc">La figura geométrica más básica con 3 lados y 3 ángulos.</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem">
+        <div>
+          <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">📐 La definición</h3>
+          <p style="color:var(--muted);line-height:1.8;margin-bottom:1rem">
+            Un <strong>triángulo</strong> es un polígono de 3 lados, 3 vértices y 3 ángulos. Es la figura geométrica más simple que existe después de la línea.
+          </p>
+          <ul style="color:var(--text);font-size:14px;line-height:2;padding-left:1.5rem">
+            <li>Tiene <strong>3 lados</strong> (segmentos que unen vértices)</li>
+            <li>Tiene <strong>3 vértices</strong> (puntos de intersección)</li>
+            <li>Tiene <strong>3 ángulos</strong> (en el interior)</li>
+            <li>La suma de sus ángulos siempre es <strong>180°</strong></li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">📝 Elementos</h3>
+          <canvas id="trianguloCanvas" style="display:block;width:100%;height:200px;background:var(--surface2);border-radius:12px;margin-bottom:1rem"></canvas>
+          <ul style="color:var(--muted);font-size:13px;line-height:1.8;padding-left:1.5rem">
+            <li><strong>Vértices:</strong> A, B, C</li>
+            <li><strong>Lados:</strong> a, b, c</li>
+            <li><strong>Ángulos:</strong> α, β, γ</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--gold)">📏 Perímetro y Área</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="color:var(--muted);font-size:13px;margin-bottom:0.5rem">Perímetro</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--text)">P = a + b + c</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="color:var(--muted);font-size:13px;margin-bottom:0.5rem">Área (Fórmula de Herón)</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text)">A = √s(s-a)(s-b)(s-c)</p>
+          <p style="color:var(--muted);font-size:11px;margin-top:0.5rem">s = P/2 (semiperímetro)</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="color:var(--muted);font-size:13px;margin-bottom:0.5rem">Área (base × altura)</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text)">A = (b × h) / 2</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIANGULO CLASIFICACION -->
+<section class="section" id="clasificacion">
+  <div class="container">
+    <p class="section-label">4.2 — Clasificación</p>
+    <h2 class="section-title">Clasificación de Triángulos</h2>
+    <p class="section-desc">Los triángulos se clasifican por sus lados y por sus ángulos.</p>
+
+    <!-- Por lados -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">Por sus lados</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem;line-height:1">🔺</div>
+          <p style="color:var(--text);font-weight:600;margin-bottom:0.5rem">Equilátero</p>
+          <p style="color:var(--muted);font-size:13px">3 lados iguales</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem;line-height:1">📐</div>
+          <p style="color:var(--text);font-weight:600;margin-bottom:0.5rem">Isósceles</p>
+          <p style="color:var(--muted);font-size:13px">2 lados iguales</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem;line-height:1">🔻</div>
+          <p style="color:var(--text);font-weight:600;margin-bottom:0.5rem">Escaleno</p>
+          <p style="color:var(--muted);font-size:13px">3 lados diferentes</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Por ángulos -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--gold)">Por sus ángulos</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem;line-height:1">🔵</div>
+          <p style="color:var(--text);font-weight:600;margin-bottom:0.5rem">Acutángulo</p>
+          <p style="color:var(--muted);font-size:13px">3 ángulos agudos</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem;line-height:1">📐</div>
+          <p style="color:var(--text);font-weight:600;margin-bottom:0.5rem">Rectángulo</p>
+          <p style="color:var(--muted);font-size:13px">1 ángulo de 90°</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem;line-height:1">🔶</div>
+          <p style="color:var(--text);font-weight:600;margin-bottom:0.5rem">Obtusángulo</p>
+          <p style="color:var(--muted);font-size:13px">1 ángulo obtuso</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIANGULO RECTANGULO TEOREMAS -->
+<section class="section" id="teoremas">
+  <div class="container">
+    <p class="section-label">4.3 — Teoremas</p>
+    <h2 class="section-title">Triángulo Rectángulo</h2>
+    <p class="section-desc">Los teoremas fundamentales que cumplen los triángulos rectángulos.</p>
+
+    <!-- Teorema de Pitágoras -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">📐 Teorema de Pitágoras</h3>
+      <p style="color:var(--muted);line-height:1.7;margin-bottom:1rem">
+        En todo triángulo rectángulo, el cuadrado de la hipotenusa es igual a la suma de los cuadrados de los catetos.
+      </p>
+      <canvas id="pitagorasCanvas" style="display:block;width:100%;height:220px;background:var(--surface2);border-radius:12px;margin-bottom:1rem"></canvas>
+      <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+        <p style="font-family:'DM Mono',monospace;font-size:1.4rem;color:var(--text);text-align:center">c² = a² + b²</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem">
+        <div style="background:var(--surface2);border-radius:8px;padding:1rem;text-align:center">
+          <p style="color:var(--muted);font-size:12px">Calcular hipotenusa</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--text)">c = √(a² + b²)</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:1rem;text-align:center">
+          <p style="color:var(--muted);font-size:12px">Calcular cateto</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--text)">a = √(c² - b²)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Teorema de la altura -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--gold)">📏 Teorema de la Altura</h3>
+      <p style="color:var(--muted);line-height:1.7;margin-bottom:1rem">
+        En un triángulo rectángulo, la altura sobre la hipotenusa es media proporcional entre las proyecciones de los catetos.
+      </p>
+      <canvas id="alturaCanvas" style="display:block;width:100%;height:180px;background:var(--surface2);border-radius:12px;margin-bottom:1rem"></canvas>
+      <div style="background:var(--surface2);border-radius:12px;padding:1.25rem">
+        <p style="font-family:'DM Mono',monospace;font-size:1.3rem;color:var(--text);text-align:center">h² = m · n</p>
+        <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">h = altura, m y n = proyecciones de los catetos</p>
+      </div>
+    </div>
+
+    <!-- Teorema de los catetos -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--sin)">📐 Teorema de los Catetos</h3>
+      <p style="color:var(--muted);line-height:1.7;margin-bottom:1rem">
+        Cada cateto es media proporcional entre la hipotenusa y su proyección sobre ella.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="color:var(--text);font-size:14px;margin-bottom:0.5rem">Cateto a</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1.3rem;color:var(--sin)">a² = c · m</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="color:var(--text);font-size:14px;margin-bottom:0.5rem">Cateto b</p>
+          <p style="font-family:'DM Mono',monospace;font-size:1.3rem;color:var(--cos)">b² = c · n</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Teorema de la mediana -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--cos)">📓 Teorema de la Mediana</h3>
+      <p style="color:var(--muted);line-height:1.7;margin-bottom:1rem">
+        En un triángulo rectángulo, la mediana a la hipotenusa es igual a la mitad de la hipotenusa.
+      </p>
+      <canvas id="medianaCanvas" style="display:block;width:100%;height:180px;background:var(--surface2);border-radius:12px;margin-bottom:1rem"></canvas>
+      <div style="background:var(--surface2);border-radius:12px;padding:1.25rem">
+        <p style="font-family:'DM Mono',monospace;font-size:1.3rem;color:var(--text);text-align:center">m = c / 2</p>
+        <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">m = mediana a la hipotenusa</p>
+      </div>
+    </div>
+
+    <!-- Teoremas reciprocos -->
+    <div style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);border-radius:16px;padding:1.5rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">🔄 Teoremas Recíprocos</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem">
+        <div>
+          <p style="color:var(--text);font-weight:600;margin-bottom:0.5rem">Recíproco de Pitágoras:</p>
+          <p style="color:var(--muted);font-size:14px;line-height:1.6">
+            Si en un triángulo se cumple <strong>a² + b² = c²</strong>, entonces es un triángulo rectángulo.
+          </p>
+        </div>
+        <div>
+          <p style="color:var(--text);font-weight:600;margin-bottom:0.5rem">Aplicaciones:</p>
+          <ul style="color:var(--muted);font-size:13px;line-height:1.8;padding-left:1rem">
+            <li>Identificar triángulos rectángulos</li>
+            <li>Clasificar triángulos</li>
+            <li>Verificar si un triángulo es rectángulo</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIÁNGULO ISÓSCELES -->
+<section class="section" id="isoceles">
+  <div class="container">
+    <p class="section-label">4.3b — Isósceles</p>
+    <h2 class="section-title">Triángulo Isósceles</h2>
+    <p class="section-desc">Un triángulo isósceles tiene dos lados iguales y dos ángulos iguales.</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">📐 Características</h3>
+      <ul style="color:var(--muted);line-height:2;padding-left:1.5rem">
+        <li><strong>Dos lados iguales:</strong> los lados iguales se llaman "catetos" o "lados iguales"</li>
+        <li><strong>Ángulos iguales:</strong> los ángulos opuestos a los lados iguales son iguales</li>
+        <li><strong>Altura = Mediana:</strong> la altura, mediana y bisectriz desde el vértice superior coinciden</li>
+        <li><strong>Eje de simetría:</strong> la línea que pasa por el vértice y el punto medio de la base</li>
+      </ul>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--gold)">⚖️ Teoremas del Isósceles</h3>
+      <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+        <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text);text-align:center">h = √(a² - (b/2)²)</p>
+        <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">Altura en términos de los lados iguales (a) y la base (b)</p>
+      </div>
+      <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+        <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text);text-align:center">A = (b × h) / 2</p>
+        <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">Área = base × altura / 2</p>
+      </div>
+      <div style="background:var(--surface2);border-radius:12px;padding:1.25rem">
+        <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text);text-align:center">α = β</p>
+        <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">Los ángulos en la base son iguales</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIANGULOS CUALESQUIERA -->
+<section class="section" id="teoremas-cualesquiera">
+  <div class="container">
+    <p class="section-label">4.4 — Cualesquiera</p>
+    <h2 class="section-title">Teoremas en Triángulos Cualesquiera</h2>
+    <p style="color:var(--muted);margin-bottom:1rem">Teoremas que aplican a cualquier tipo de triángulo.</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">⚖️ Teorema de la mediana (Apolonio)</h3>
+      <p style="color:var(--muted);line-height:1.7;margin-bottom:1rem">
+        En cualquier triángulo, la mediana une un vértice con el punto medio del lado opuesto.
+      </p>
+      <div style="background:var(--surface2);border-radius:12px;padding:1.25rem">
+        <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text);text-align:center">AB² + AC² = 2(AM² + BM²)</p>
+        <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">donde M es el punto medio del lado BC</p>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--gold)">📐 Ley de los senos</h3>
+      <p style="color:var(--muted);line-height:1.7;margin-bottom:1rem">
+        En todo triángulo, la proporción entre cada lado y el seno de su ángulo opuesto es constante.
+      </p>
+      <div style="background:var(--surface2);border-radius:12px;padding:1.25rem">
+        <p style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--text);text-align:center">a/sen(α) = b/sen(β) = c/sen(γ)</p>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--cos)">📏 Ley de los cosenos</h3>
+      <p style="color:var(--muted);line-height:1.7;margin-bottom:1rem">
+        Generalización del teorema de Pitágoras para triángulos cualesquiera.
+      </p>
+      <div style="background:var(--surface2);border-radius:12px;padding:1.25rem">
+        <p style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--text);text-align:center">c² = a² + b² − 2ab·cos(γ)</p>
+        <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">Para γ obtuso: c² > a² + b²</p>
+        <p style="color:var(--muted);font-size:12px">Para γ agudo: c² < a² + b²</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGARITHM DEFINITION -->
+<section class="section" id="definicion-log">
+  <div class="container">
+    <p class="section-label">5.1 — ¿Qué es un Logaritmo?</p>
+    <h2 class="section-title">¿Qué es un Logaritmo?</h2>
+    <p class="section-desc">La definición completa que necesitás para entender logarithmos de verdad.</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem">
+        <div>
+          <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--gold)">📓 La definición</h3>
+          <p style="color:var(--muted);line-height:1.8;margin-bottom:1.25rem">
+            Un <strong>logaritmo</strong> es la operación inversa a la exponenciación. Responde a la pregunta:
+          </p>
+          <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+            <p style="font-size:14px;color:var(--muted);margin-bottom:0.5rem">¿A qué potencia debo elevar la <em>base</em> para obtener este número?</p>
+            <p style="font-family:'DM Mono',monospace;font-size:1.3rem;color:var(--text)">log<sub>a</sub>(x) = y  ⟺  a<sup>y</sup> = x</p>
+          </div>
+          <p style="color:var(--muted);font-size:14px;line-height:1.7">
+            Se lee: "el logaritmo base <em>a</em> de <em>x</em> es igual a <em>y</em>".
+          </p>
+        </div>
+        <div>
+          <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--gold)">📝 Ejemplo concreto</h3>
+          <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+            <p style="color:var(--muted);font-size:13px;margin-bottom:0.5rem">Si 2³ = 8, entonces:</p>
+            <p style="font-family:'DM Mono',monospace;font-size:1.4rem;color:var(--gold)">log₂(8) = 3</p>
+          </div>
+          <ul style="color:var(--text);font-size:14px;line-height:2;padding-left:1.5rem">
+            <li><strong>Base:</strong> 2 (el número que elevamos)</li>
+            <li><strong>Argumento:</strong> 8 (el resultado buscado)</li>
+            <li><strong>Resultado:</strong> 3 (el exponente)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why useful -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--accent)">🤔 ¿Por qué existen los logaritmos?</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem">
+        <div>
+          <p style="color:var(--muted);line-height:1.7">
+            <strong>Antes de las calculadoras:</strong> multiplicar números grandes era difícil. Los logaritmos convierten:
+          </p>
+          <ul style="color:var(--text);font-size:14px;line-height:2;margin-top:0.75rem;padding-left:1.5rem">
+            <li>❌ <strong>Multiplicación</strong> → ✅ <strong>Suma</strong></li>
+            <li>❌ <strong>División</strong> → ✅ <strong>Resta</strong></li>
+            <li>❌ <strong>Potenciación</strong> → ✅ <strong>Multiplicación</strong></li>
+          </ul>
+        </div>
+        <div>
+          <p style="color:var(--muted);line-height:1.7">
+            <strong>Usos reales:</strong> los logaritmos están en todos lados:
+          </p>
+          <ul style="color:var(--text);font-size:14px;line-height:2;margin-top:0.75rem;padding-left:1.5rem">
+            <li>🔊 <strong>Escala de Richter</strong> (terremotos)</li>
+            <li>🔊 <strong>Decibeles</strong> (sonido)</li>
+            <li>🧬 <strong>pH</strong> (Química)</li>
+            <li>💰 <strong>Interés compuesto</strong> (Finanzas)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bases más comunes -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-top:1.5rem">
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:1rem;color:var(--gold)">🔢 Bases más comunes</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--gold);margin-bottom:0.5rem">log₁₀</p>
+          <p style="color:var(--muted);font-size:13px">Base 10</p>
+          <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">"logaritmo común"</p>
+          <p style="color:var(--text);font-size:12px;margin-top:0.5rem">log₁₀(100) = 2</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--gold);margin-bottom:0.5rem">ln</p>
+          <p style="color:var(--muted);font-size:13px">Base <em>e</em> ≈ 2.718</p>
+          <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">"logaritmo natural"</p>
+          <p style="color:var(--text);font-size:12px;margin-top:0.5rem">ln(e) = 1</p>
+        </div>
+        <div style="background:var(--surface2);border-radius:12px;padding:1.25rem;text-align:center">
+          <p style="font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--gold);margin-bottom:0.5rem">log₂</p>
+          <p style="color:var(--muted);font-size:13px">Base 2</p>
+          <p style="color:var(--muted);font-size:12px;margin-top:0.5rem">"logaritmo binario"</p>
+          <p style="color:var(--text);font-size:12px;margin-top:0.5rem">log₂(8) = 3</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Importante -->
+    <div style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);border-radius:16px;padding:1.5rem;margin-top:1.5rem">
+      <p style="font-size:14px;color:var(--accent);margin-bottom:0.5rem">⚠️ Condición indispensable</p>
+      <p style="color:var(--text);line-height:1.7">
+        La base <strong>a</strong> debe ser <em>mayor que 0</em> y <em>diferente de 1</em> (a > 0, a ≠ 1). Además, el argumento <strong>x</strong> debe ser <em>positivo</em> (x > 0).
+      </p>
+      <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap">
+        <span style="background:var(--surface2);border-radius:8px;padding:0.5rem 1rem;font-size:13px;color:var(--muted)">✓ a > 0</span>
+        <span style="background:var(--surface2);border-radius:8px;padding:0.5rem 1rem;font-size:13px;color:var(--muted)">✓ a ≠ 1</span>
+        <span style="background:var(--surface2);border-radius:8px;padding:0.5rem 1rem;font-size:13px;color:var(--muted)">✓ x > 0</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGARITHMS -->
+<section class="section" id="logaritmos">
+  <div class="container">
+    <p class="section-label">5.2 — Propiedades</p>
+    <h2 class="section-title">Propiedades de los logaritmos</h2>
+    <p class="section-desc">Un logaritmo responde: <em>¿a qué potencia elevo la base para obtener ese número?</em> Si 2³ = 8, entonces log₂(8) = 3.</p>
+
+    <div class="logs-grid">
+      <div class="log-card">
+        <div class="log-num">Propiedad 01</div>
+        <h4>📦 Producto → suma</h4>
+        <span class="log-formula">log(A · B) = log(A) + log(B)</span>
+        <p>Multiplicar dentro del log se convierte en sumar los logaritmos.</p>
+        <div class="example">log(2 · 8) = log(2) + log(8) = log(16)</div>
+      </div>
+      <div class="log-card">
+        <div class="log-num">Propiedad 02</div>
+        <h4>✂️ Cociente → resta</h4>
+        <span class="log-formula">log(A / B) = log(A) − log(B)</span>
+        <p>Dividir dentro del log se convierte en restar los logaritmos.</p>
+        <div class="example">log(8 / 2) = log(8) − log(2) = log(4)</div>
+      </div>
+      <div class="log-card">
+        <div class="log-num">Propiedad 03</div>
+        <h4>⬆️ Potencia → multiplica</h4>
+        <span class="log-formula">log(Aⁿ) = n · log(A)</span>
+        <p>El exponente "baja" y se multiplica por delante del logaritmo.</p>
+        <div class="example">log(8³) = 3 · log(8)</div>
+      </div>
+      <div class="log-card">
+        <div class="log-num">Propiedad 04</div>
+        <h4>🎯 Logaritmo de 1</h4>
+        <span class="log-formula">logₐ(1) = 0</span>
+        <p>Cualquier base elevada a 0 es 1, por eso el log de 1 siempre es cero.</p>
+        <div class="example">log₁₀(1) = 0, log₂(1) = 0</div>
+      </div>
+      <div class="log-card">
+        <div class="log-num">Propiedad 05</div>
+        <h4>🏠 Logaritmo de la base</h4>
+        <span class="log-formula">logₐ(a) = 1</span>
+        <p>¿A qué potencia elevo 2 para obtener 2? A la primera.</p>
+        <div class="example">log₂(2) = 1, log₁₀(10) = 1</div>
+      </div>
+      <div class="log-card">
+        <div class="log-num">Propiedad 06</div>
+        <h4>🔄 Cambio de base</h4>
+        <span class="log-formula">logₐ(b) = log(b) / log(a)</span>
+        <p>Convierte cualquier logaritmo a base 10 o base e para calcularlo fácil.</p>
+        <div class="example">log₂(8) = log(8)/log(2) = 3</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Hecho con matemáticas y <span>amor por la educación</span> ✦ Matemática Interactiva</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
